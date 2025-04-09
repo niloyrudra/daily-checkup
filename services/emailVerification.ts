@@ -4,7 +4,6 @@ import { doc, setDoc } from "firebase/firestore";
 export const sendFriendVerificationEmail = async (userId: string, friendEmail: string) => {
   try {
     const verificationLink = `myapp://(auth)/verify-friend?user=${userId}&email=${friendEmail}`;
-    // const verificationLink = `https://daily-checkup-ece39.firebaseapp.com/(auth)/verify-friend?user=${userId}&email=${friendEmail}`;
     
     // Simulate sending an email
     console.log(`Email sent to ${friendEmail}: Click to verify - ${verificationLink}`);
