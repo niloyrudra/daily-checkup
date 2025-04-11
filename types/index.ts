@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons"
 import { Href } from "expo-router"
 import { ReactNode } from "react"
 import { ColorValue, ImageBackgroundProps, ImageSourcePropType, InputModeOptions, KeyboardType, StyleProp, TextProps, TextStyle, ViewProps, ViewStyle } from "react-native"
@@ -136,6 +137,14 @@ type LessonProps = {
     buttonStyle?: StyleProp<ViewStyle>
 }
 
+type FloatingArrowButtonProps = {
+  onPress: () => void;
+  buttonStyle?: StyleProp<ViewStyle>;
+  iconName: keyof typeof Feather.glyphMap; // ✅ Only valid Feather icon names
+  iconSize?: number;
+  iconColor?: ColorValue
+};
+
 export {
   UserData,
   Category,
@@ -152,5 +161,6 @@ export {
   SubmitButtonProps,
   InputProps,
   EyeProps,
-  LessonProps
+  LessonProps,
+  FloatingArrowButtonProps
 };

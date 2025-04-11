@@ -8,6 +8,8 @@ import * as Yup from "yup";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
 import TextInputComponent from "@/components/form-components/TextInputComponent";
+import FloatingArrowButton from "@/components/FloatingArrowButton";
+import { Theme } from "@/constants/theme";
 
 const ForgotPasswordSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -32,6 +34,13 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <AuthScreenLayout title="Forgot Password">
+
+      <FloatingArrowButton
+        onPress={() => router.back()}
+        iconName="chevron-left"
+        iconSize={30}
+        iconColor={Theme.secondary}
+      />
 
       <Formik
         initialValues={{ email: "" }}

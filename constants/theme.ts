@@ -1,9 +1,11 @@
 export const Theme = {
-    background: "#ebe3ce",
-    primary: "#795547",
-    secondary: "",
-    link: "#d1b48c",
-    text: ""
+  gradientColorTop: "#EBE3CE",
+  gradientColorBottom: "#C6DDA8",
+  background: "#ebe3ce",
+  primary: "#795547",
+  secondary: "#9B8379",
+  link: "#d1b48c",
+  text: ""
 }
 
 

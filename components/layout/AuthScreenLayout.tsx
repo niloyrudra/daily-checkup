@@ -5,6 +5,7 @@ import TitleComponent from '../TitleComponent';
 import AuthTopBannerComponent from '../AuthTopBannerComponent';
 import KeyboardAvoidingViewLayout from './KeyboardAvoidingViewLayout';
 import SafeAreaLayout from './SafeAreaLayout';
+import GradientWrapper from './GradientWrapper';
 // import { useTheme } from '@/theme/ThemeContext';
 
 const AuthScreenLayout = ({title, children}: {title: string, children: ReactNode}) => {
@@ -12,25 +13,30 @@ const AuthScreenLayout = ({title, children}: {title: string, children: ReactNode
     return (
     <SafeAreaLayout>
         <KeyboardAvoidingViewLayout>
+            
+            <GradientWrapper>
 
-            <View style={[STYLES.container]}>
-                {/* Banner */}
-                <AuthTopBannerComponent />
+                <View style={[STYLES.container]}>
+                    {/* Banner */}
+                    <AuthTopBannerComponent />
 
-                {/* Screen Title */}
-                <TitleComponent
-                    title={title}
-                    titleStyle={{
-                        fontSize: 32
-                    }}
-                    style={{
-                        marginBottom: 15
-                    }}
-                />
+                    {/* Screen Title */}
+                    <TitleComponent
+                        title={title}
+                        titleStyle={{
+                            fontSize: 32
+                        }}
+                        style={{
+                            marginBottom: 15
+                        }}
+                    />
 
-                {children && children}
+                    {children && children}
 
-            </View>
+                </View>
+
+            </GradientWrapper>
+
 
         </KeyboardAvoidingViewLayout>
     </SafeAreaLayout>
