@@ -8,8 +8,8 @@ if (!admin.apps.length) {
   admin.initializeApp();
 }
 
-const emailUser = process.env.FIREBASE_CONFIG ? functions.config().email?.user : "dailycheckup9@gmail.com";
-const emailPass = process.env.FIREBASE_CONFIG ? functions.config().email?.pass : "informed9639";
+const emailUser = process.env.FIREBASE_CONFIG ? functions.config().email?.user : "";
+const emailPass = process.env.FIREBASE_CONFIG ? functions.config().email?.pass : "";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
