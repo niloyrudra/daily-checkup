@@ -1,0 +1,14 @@
+# Ignore logs and configs
+firebase-debug.log
+*.log
+tsconfig.json
+tsconfig.dev.json
+
+# Ignore source TypeScript files if you're using compiled output
+src/
+
+# Ignore node_modules – Firebase will install fresh
+node_modules/
+
+# Ignore lockfile (optional, speeds up deploy)
+package-lock.json
