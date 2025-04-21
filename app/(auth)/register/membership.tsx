@@ -1,43 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, ActivityIndicator, Alert } from "react-native";
-// import { httpsCallable } from "firebase/functions";
 import { auth, functions, httpsCallable } from "@/config/firebase";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
-import { callWithAuth } from "@/utils/callWithAuth";
-import { getIdToken } from "firebase/auth";
-
-
-interface CheckoutData {
-  plan: "free" | "monthly" | "yearly";
-  successUrl: string;
-  cancelUrl: string;
-}
-interface CheckoutResponse {
-  sessionUrl: string | null;
-}
-
+import { getIdToken, onAuthStateChanged } from "firebase/auth"; // Importing necessary functions
 
 const MembershipScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
 
-  // console.log("process.env.FIREBASE_PROJECT_ID: ", process.env.FIREBASE_PROJECT_ID)
-  // console.log("process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID: ", process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID)
+  useEffect(() => {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        setIsAuthenticated(false);
+        Alert.alert("Auth Error", "You must be signed in to access this screen.");
+        router.push("/(auth)/login");  // Redirect to login page if not signed in
+      } else {
+        setIsAuthenticated(true); // User is signed in, proceed normally
+      }
+    });
 
-  const handleCheckout = async (plan: "free"|"monthly"|"yearly") => {
+    // Cleanup the listener when the component is unmounted
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleCheckout = async (plan: "free" | "monthly" | "yearly") => {
+    if (!isAuthenticated) {
+      Alert.alert("Auth Error", "You must be signed in to proceed with checkout.");
+      return;
+    }
+
     setLoading(true);
-    // const user = auth?.currentUser;
-    // console.log("Membership Screen -User:", user)
     try {
-
       const user = auth.currentUser;
 
       if (!user) throw new Error("User not signed in");
 
-      // 🔒 Force-refresh ID token so the backend receives a fresh authenticated context
+      // Force-refresh ID token so the backend receives a fresh authenticated context
       await getIdToken(user, /* forceRefresh */ true);
 
       const token = await user.getIdToken();
@@ -47,7 +50,7 @@ const MembershipScreen: React.FC = () => {
       const { data } = await createSession({
         plan,
         successUrl: Linking.createURL("/dashboard/home?session_id={CHECKOUT_SESSION_ID}"),
-        cancelUrl:  Linking.createURL("/(auth)/register/membership?canceled=true"),
+        cancelUrl: Linking.createURL("/(auth)/register/membership?canceled=true"),
       });
 
       if (data?.sessionUrl) {
@@ -68,19 +71,14 @@ const MembershipScreen: React.FC = () => {
       {loading ? (
         <ActivityIndicator size="large" />
       ) : (
-        <View
-          style={{
-            gap: 20
-          }}
-        >
+        <View style={{ gap: 20 }}>
           <ActionPrimaryButton buttonTitle="Free" onSubmit={() => handleCheckout("free")} />
-          
           <ActionPrimaryButton buttonTitle="Monthly $1.99" onSubmit={() => handleCheckout("monthly")} />
-
           <ActionPrimaryButton buttonTitle="Yearly $23.88" onSubmit={() => handleCheckout("yearly")} />
         </View>
       )}
     </AuthScreenLayout>
   );
-}
+};
+
 export default MembershipScreen;

@@ -24,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Initialize Firebase Functions
-const functions = getFunctions(app);
+const functions = getFunctions(app, "us-central1");
 const db = getFirestore(app);
 
 export type AuthUser = User | null;

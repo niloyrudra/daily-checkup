@@ -39,12 +39,7 @@ export default {
       favicon: "./assets/images/favicon.png",
     },
     plugins: [
-      [
-        "expo-router",
-        {
-          origin: false, // "https://daily-checkup.expo.app"
-        }
-      ],
+      "expo-router",
       [
         "expo-splash-screen",
         {
@@ -53,14 +48,6 @@ export default {
           resizeMode: "contain",
           backgroundColor: "#ffffff",
         },
-      ],
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.daily-checkup",
-          "enableGooglePay": true,
-          "publishableKey": process.env.STRIPE_TEST_PUBLISHABLE_KEY
-        }
       ],
       "expo-build-properties",
       "expo-dev-client",
