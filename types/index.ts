@@ -1,21 +1,46 @@
 import { Feather } from "@expo/vector-icons"
 import { Href } from "expo-router"
+import { FieldValue, Timestamp } from "firebase/firestore"
 import { ReactNode } from "react"
 import { ColorValue, DataDetectorTypes, ImageBackgroundProps, ImageSourcePropType, InputModeOptions, KeyboardType, StyleProp, TextProps, TextStyle, ViewProps, ViewStyle } from "react-native"
 import { SvgProps } from "react-native-svg"
 
+type WritableTimestamp = Timestamp | FieldValue;
+type Plan = "free" | "monthly" | "yearly";
+
+type Contact = {
+  phoneNumber: string;
+  verified: boolean;
+};
+
+type MembershipPlan = {
+  plan: Plan;
+  status: "active" | "canceled" | "trialing" | "pending";
+  since: WritableTimestamp;              // Firestore timestamp type :contentReference[oaicite:1]{index=1}
+};
+
 type UserData = {
-  name: string,
-  email: string,
-  phoneNumber: string,
-  contactNumbers: Record<string, boolean>,
-  schedules: Record<string, boolean>,
-  emailVerified: boolean,
-  phoneNumberVerified: boolean,
-  contactNumbersVerified: boolean,
-  membershipPlan: string,
-  createdAt: Date
-}
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  phoneNumber: string;
+  phoneNumberVerified: boolean;
+  
+  // Two distinct contacts
+  contactNumbers: {
+    contact1: Contact;
+    contact2: Contact;
+  };
+  contactNumbersVerified: boolean;  
+
+  // any schedule flags by id
+  schedules: Record<string, boolean>;
+
+  membershipPlan: MembershipPlan;
+  createdAt: WritableTimestamp;
+};
+
+
 
 type InputProps = { // extends TextInputProps -> better approach
   value: string,
@@ -86,22 +111,6 @@ type UnitDataProps = {
 }
 
 
-// QUIZ
-type Quiz = {
-  id: string,
-  title: string,
-  isCorrect: boolean
-}
-
-type QuizProps = {
-    title: string,
-    isCorrect: boolean,
-    onSelect: (title: string, isCorrect: boolean ) => void,
-    isSelectionHappened?: boolean,
-    containerWidth: number
-    marginRight?: number
-    customStyle?: StyleProp<ViewStyle>
-}
 // LINK Props
 type LinkProps = {
   text: string,
@@ -111,8 +120,8 @@ type LinkProps = {
 
 // BANNER Props
 type BannerProps = {
-    width?: number,
-    height?: number
+  width?: number,
+  height?: number
 }
 // TITLE Props
 type TitleProps = {
@@ -154,14 +163,15 @@ type FloatingArrowButtonProps = {
 
 export {
   UserData,
+  Plan,
+  Contact,
+  MembershipPlan,
   Category,
   CategoryProps,
   UnitLesson,
   UnitLessonProps,
   UnitProps,
   UnitDataProps,
-  Quiz,
-  QuizProps,
   LinkProps,
   BannerProps,
   TitleProps,

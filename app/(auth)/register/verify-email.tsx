@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import { auth, db } from "@/config/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
@@ -29,9 +29,11 @@ const VerifyEmail: React.FC = () => {
   return (
     <AuthScreenLayout title="Email Verification">
       <View style={{gap: 20, justifyContent: "center", alignItems: "center"}}>
-        <View style={{
-          gap: 6
-        }}>
+        <View
+          style={{
+            gap: 6
+          }}
+        >
 
           <Text>{verified ? "Email Verified!" : "Waiting for email verification..."}</Text>
           {!verified && (<ActivityIndicator size={24} color="blue" />)}

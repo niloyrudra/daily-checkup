@@ -5,8 +5,8 @@ import { createUserWithEmailAndPassword, sendEmailVerification, User } from "fir
 import { auth, db, functions } from "@/config/firebase";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { doc, setDoc } from "firebase/firestore";
-import { UserData } from "@/types";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { MembershipPlan, UserData } from "@/types";
 import TextInputComponent from "@/components/form-components/TextInputComponent";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
@@ -21,43 +21,65 @@ const UserInfoScreenSchema = Yup.object().shape({
     password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
 });
 
+const defaultMembershipPlan: MembershipPlan = {
+  plan: "free",              // user starts on the free tier
+  status: "pending",         // pending until they actively subscribe
+  since: serverTimestamp()   // Firestore timestamp when this record is created
+};
+
 const UserInfoScreen: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleUserInfoScreen = async (name: string, email: string, password: string) => {
-    setLoading(true)
+  const handleUserInfoScreen = async (
+    name: string,
+    email: string,
+    password: string
+  ) => {
+    setLoading(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // 1️⃣ Create user + send email verification
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       await sendEmailVerification(userCredential.user);
-      Alert.alert("Check your email!", "Please verify your email before logging in.");
-
-      // Store user data in Firestore
+      Alert.alert(
+        "Check your email!",
+        "Please verify your email before logging in."
+      );
+  
+      // 2️⃣ Build UserData with Firestore serverTimestamp
       const userData: UserData = {
         name,
         email,
-        phoneNumber: '',
         emailVerified: false,
+        phoneNumber: "",
         phoneNumberVerified: false,
         contactNumbersVerified: false,
-        contactNumbers: {},
+        contactNumbers: {
+          contact1: { phoneNumber: "", verified: false },
+          contact2: { phoneNumber: "", verified: false }
+        },
         schedules: {},
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),       // ← server timestamp :contentReference[oaicite:9]{index=9}
+        membershipPlan: defaultMembershipPlan
       };
-      
+  
+      // 3️⃣ Write to Firestore using setDoc
       await setDoc(doc(db, "users", userCredential.user.uid), userData);
-
-      console.log("New User:", userCredential?.user)
-
+      console.log("New User saved:", userCredential.user.uid);
+  
+      // 4️⃣ Navigate to the “verify email” screen
       router.push("/(auth)/register/verify-email");
-
     } catch (error: any) {
       Alert.alert("User Info Error", error.message);
-    }
-    finally {
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
+  
 
   return (
     <AuthScreenLayout title="Sign Up">

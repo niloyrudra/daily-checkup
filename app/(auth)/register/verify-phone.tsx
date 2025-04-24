@@ -5,7 +5,7 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { doc, updateDoc } from "firebase/firestore";
-import { auth, db,  } from "@/config/firebase";
+import { auth, db, functions, httpsCallable,  } from "@/config/firebase";
 
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
@@ -30,65 +30,126 @@ const PhoneAuthScreen: React.FC = () => {
   const [step, setStep] = useState<'enterPhone' | 'enterCode'>('enterPhone');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
 
-  console.log("F_BASE:", F_BASE_API_KEY)
-  console.log("user:", auth.currentUser)
+  // console.log("F_BASE:", F_BASE_API_KEY)
+  // console.log("user:", auth.currentUser)
 
   const handleSendCode = async (phone: string) => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${F_BASE_API_KEY}`,
-        {
-          phoneNumber: phone,
-          recaptchaToken: 'unused',
-        }
-      );
-      setPhoneNumber(phone); // Store to reuse later
-      setSessionInfo(response.data.sessionInfo);
-      console.log("Send Code Res:", response)
-      setStep('enterCode');
-    } catch (err: any) {
-      Alert.alert('Error sending OTP', err.response?.data?.error?.message || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyCode = async (otpCode: string) => {
-    if (!sessionInfo) return;
-
     setLoading(true);
     try {
-      // 🔐 Verify the OTP and sign in
-      const verificationRes = await axios.post(
-        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key=${F_BASE_API_KEY}`,
-        {
-          sessionInfo,
-          code: otpCode,
-        }
+      // Ensure user is signed in
+      const user = auth.currentUser;
+      if (!user) throw new Error("User must be signed in");
+  
+      // Call your Firebase Function
+      const sendOtp = httpsCallable<{ phoneNumber: string }, { success: boolean }>(
+        functions,
+        "sendOtpToPhone"
       );
-
-      // console.log("verificationRes:", verificationRes)
-      const { idToken, localId: uid, phoneNumber: verifiedPhoneNumber } = verificationRes.data;
-
-      const user = auth.currentUser
-
-      // ✅ Update Firestore
-      const userRef = doc(db, "users", user?.uid);
-      await updateDoc(userRef, {
-        phoneNumber: verifiedPhoneNumber,
-        phoneNumberVerified: true,
-      });
-
-      Alert.alert('Success', 'Phone number verified and saved!');
-      router.push("/(auth)/register/contacts-verification");
-
+      const res = await sendOtp({ phoneNumber: phone });
+      if (res.data.success) {
+        setPhoneNumber(phone);
+        setStep("enterCode");
+      } else {
+        throw new Error("Failed to send OTP");
+      }
     } catch (err: any) {
-      Alert.alert('Error verifying OTP', err.response?.data?.error?.message || err.message);
+      Alert.alert("Error sending OTP", err.message || "Unable to send code");
     } finally {
       setLoading(false);
     }
   };
+  
+
+  const handleVerifyCode = async (otpCode: string) => {
+    if (!phoneNumber) return;
+    setLoading(true);
+    try {
+      // Ensure user is signed in
+      const user = auth.currentUser;
+      if (!user) throw new Error("User must be signed in");
+  
+      // Call your Firebase Function
+      const verifyOtp = httpsCallable<{ code: string }, { success: boolean }>(
+        functions,
+        "verifyOtpCode"
+      );
+      const res = await verifyOtp({ code: otpCode });
+      if (res.data.success) {
+        // Mark in Firestore
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          phoneNumber,
+          phoneNumberVerified: true,
+        });
+        Alert.alert("Success", "Phone number verified!");
+        router.push("/(auth)/register/contacts-verification");
+      } else {
+        throw new Error("Invalid code");
+      }
+    } catch (err: any) {
+      Alert.alert("Error verifying OTP", err.message || "Verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  // const handleSendCode = async (phone: string) => {
+  //   try {
+  //     setLoading(true);
+  //     const response = await axios.post(
+  //       `https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${F_BASE_API_KEY}`,
+  //       {
+  //         phoneNumber: phone,
+  //         recaptchaToken: 'unused',
+  //       }
+  //     );
+  //     setPhoneNumber(phone); // Store to reuse later
+  //     setSessionInfo(response.data.sessionInfo);
+  //     console.log("Send Code Res:", response)
+  //     setStep('enterCode');
+  //   } catch (err: any) {
+  //     Alert.alert('Error sending OTP', err.response?.data?.error?.message || err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const handleVerifyCode = async (otpCode: string) => {
+  //   if (!sessionInfo) return;
+
+  //   setLoading(true);
+  //   try {
+  //     // 🔐 Verify the OTP and sign in
+  //     const verificationRes = await axios.post(
+  //       `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key=${F_BASE_API_KEY}`,
+  //       {
+  //         sessionInfo,
+  //         code: otpCode,
+  //       }
+  //     );
+
+  //     // console.log("verificationRes:", verificationRes)
+  //     const { idToken, localId: uid, phoneNumber: verifiedPhoneNumber } = verificationRes.data;
+
+  //     const user = auth.currentUser
+
+  //     // ✅ Update Firestore
+  //     const userRef = doc(db, "users", user?.uid);
+  //     await updateDoc(userRef, {
+  //       phoneNumber: verifiedPhoneNumber,
+  //       phoneNumberVerified: true,
+  //     });
+
+  //     Alert.alert('Success', 'Phone number verified and saved!');
+  //     router.push("/(auth)/register/contacts-verification");
+
+  //   } catch (err: any) {
+  //     Alert.alert('Error verifying OTP', err.response?.data?.error?.message || err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <AuthScreenLayout title="Phone Number Verification">

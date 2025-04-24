@@ -1,22 +1,18 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
+    "rootDir": "src", // compile from src
+    "outDir": "lib",             // emit JS here
+    "module": "CommonJS",        // required by Node runtime
+    "moduleResolution": "node",  // use Node-style resolution :contentReference[oaicite:7]{index=7}
+    "target": "ES2020",
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
     "skipLibCheck": true,
-    "sourceMap": true,
     "strict": true,
-    "target": "ES2017",
-    "lib": ["es2017"],
-    "types": [
-      "node"
-    ] 
+    "sourceMap": true,
+    "types": ["node"]
   },
-  "compileOnSave": true,
   "include": [
-    "src"
+    "src",
+    ".eslintrc.js"
   ]
 }

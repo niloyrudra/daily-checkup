@@ -1,70 +1,110 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Alert } from "react-native";
-import { auth, functions, httpsCallable } from "@/config/firebase";
 import { useRouter } from "expo-router";
 import * as Linking from "expo-linking";
-import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
+import { analytics, auth, functions, httpsCallable } from "@/config/firebase";
+import { getIdToken } from "firebase/auth";
+
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
-import { getIdToken, onAuthStateChanged } from "firebase/auth"; // Importing necessary functions
+import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
+import { logEvent } from "firebase/analytics";
 
 const MembershipScreen: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [authReady, setAuthReady] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Listen for authentication state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        setIsAuthenticated(false);
-        Alert.alert("Auth Error", "You must be signed in to access this screen.");
-        router.push("/(auth)/login");  // Redirect to login page if not signed in
-      } else {
-        setIsAuthenticated(true); // User is signed in, proceed normally
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      try {
+        if (!user) {
+          Alert.alert("Auth Error", "Please sign in again.");
+          router.replace("/(auth)/login");
+        } else {
+          // 🔒 Force-refresh token right after auth state confirms
+          await getIdToken(user, true);
+          setAuthReady(true);
+        }
+      }
+      catch( error: any ) {
+        console.error( "On load Error:", error )
       }
     });
 
-    // Cleanup the listener when the component is unmounted
     return () => unsubscribe();
-  }, [router]);
+  }, []);
 
   const handleCheckout = async (plan: "free" | "monthly" | "yearly") => {
-    if (!isAuthenticated) {
-      Alert.alert("Auth Error", "You must be signed in to proceed with checkout.");
-      return;
-    }
-
     setLoading(true);
     try {
       const user = auth.currentUser;
-
       if (!user) throw new Error("User not signed in");
 
-      // Force-refresh ID token so the backend receives a fresh authenticated context
-      await getIdToken(user, /* forceRefresh */ true);
+      // 🔐 Force refresh token before API call
+      await getIdToken(user, true);
 
-      const token = await user.getIdToken();
-      console.log("Firebase Auth Token:", token);
+      // logEvent(analytics, "checkout_attempt", {
+      //   plan,
+      //   timestamp: Date.now(),
+      // });
 
-      const createSession = httpsCallable(functions, "createCheckoutSession");
-      const { data } = await createSession({
-        plan,
-        successUrl: Linking.createURL("/dashboard/home?session_id={CHECKOUT_SESSION_ID}"),
-        cancelUrl: Linking.createURL("/(auth)/register/membership?canceled=true"),
+
+      // const createSession = httpsCallable(functions, "createCheckoutSession");
+
+      // console.log( "CreateSession:", createSession );
+
+      // const { data } = await createSession({
+      //   plan,
+      //   successUrl: Linking.createURL("/dashboard/home?session_id={CHECKOUT_SESSION_ID}"),
+      //   cancelUrl: Linking.createURL("/(auth)/register/membership?canceled=true"),
+      // });
+
+      // if (data?.sessionUrl) {
+      //   Linking.openURL(data.sessionUrl);
+      // } else {
+      //   throw new Error("No session URL returned");
+      // }
+
+      // const user = auth.currentUser;
+      if (!user) throw new Error("Not signed in");
+
+      const idToken = await user.getIdToken(true); // force refresh
+
+      const response = await fetch(`https://us-central1-daily-checkup-ece39.cloudfunctions.net/createCheckoutRequestSession`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          plan,
+          uid: user?.uid ?? ""
+        }),
       });
 
-      if (data?.sessionUrl) {
-        // Open Stripe’s hosted checkout
-        Linking.openURL(data?.sessionUrl);
+      const result = await response.json();
+      if (result.sessionUrl) {
+        Linking.openURL(result.sessionUrl);
       } else {
-        throw new Error("No session URL returned");
+        Alert.alert("Checkout failed", "No session URL returned.");
       }
+
+
+
     } catch (err: any) {
-      Alert.alert("Checkout Error", err.message || "Unable to start checkout");
+      Alert.alert("Checkout Error", err.message || "Could not start Stripe checkout.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (!authReady) {
+    return (
+      <AuthScreenLayout title="Membership Plans">
+        <ActivityIndicator size="large" />
+      </AuthScreenLayout>
+    );
+  }
 
   return (
     <AuthScreenLayout title="Membership Plans">
