@@ -16,7 +16,7 @@ type Contact = {
 type MembershipPlan = {
   plan: Plan;
   status: "active" | "canceled" | "trialing" | "pending";
-  since: WritableTimestamp;              // Firestore timestamp type :contentReference[oaicite:1]{index=1}
+  since: WritableTimestamp;
 };
 
 type UserData = {

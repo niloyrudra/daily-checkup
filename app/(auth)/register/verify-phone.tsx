@@ -11,6 +11,7 @@ import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
 import TextInputComponent from "@/components/form-components/TextInputComponent";
 import STYLES from "@/constants/styles";
+import { BASE_URL } from "@/config/config";
 
 const F_BASE_API_KEY = process.env.FIREBASE_API_KEY;
 
@@ -25,56 +26,50 @@ const phoneSchema = Yup.object().shape({
 
 const PhoneAuthScreen: React.FC = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [sessionInfo, setSessionInfo] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  // const [sessionInfo, setSessionInfo] = useState<string | null>(null);
   const [step, setStep] = useState<'enterPhone' | 'enterCode'>('enterPhone');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
 
-  // console.log("F_BASE:", F_BASE_API_KEY)
-  // console.log("user:", auth.currentUser)
 
-  const handleSendCode = async (phone: string) => {
-    setLoading(true);
+  const handleSendCode = async (phoneNumber: string) => {
+    setLoading(true)
     try {
-      // Ensure user is signed in
-      const user = auth.currentUser;
-      if (!user) throw new Error("User must be signed in");
+      setPhoneNumber( prevValue => prevValue = phoneNumber )
+      const response = await fetch(`${BASE_URL}/api/send-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber }),
+      });
   
-      // Call your Firebase Function
-      const sendOtp = httpsCallable<{ phoneNumber: string }, { success: boolean }>(
-        functions,
-        "sendOtpToPhone"
-      );
-      const res = await sendOtp({ phoneNumber: phone });
-      if (res.data.success) {
-        setPhoneNumber(phone);
-        setStep("enterCode");
-      } else {
-        throw new Error("Failed to send OTP");
-      }
-    } catch (err: any) {
-      Alert.alert("Error sending OTP", err.message || "Unable to send code");
-    } finally {
-      setLoading(false);
+      const data = await response.json();
+      setStep("enterCode");
+      return data;
+    } catch (error) {
+      console.error('Send OTP failed:', error);
+      return { success: false };
+    }
+    finally {
+      setLoading(false)
     }
   };
-  
 
-  const handleVerifyCode = async (otpCode: string) => {
-    if (!phoneNumber) return;
-    setLoading(true);
+  const handleVerifyCode = async (otp: string) => {
+    setLoading(true)
     try {
-      // Ensure user is signed in
       const user = auth.currentUser;
       if (!user) throw new Error("User must be signed in");
+      const response = await fetch(`${BASE_URL}/api/verify-otp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber, otp }),
+      });
   
-      // Call your Firebase Function
-      const verifyOtp = httpsCallable<{ code: string }, { success: boolean }>(
-        functions,
-        "verifyOtpCode"
-      );
-      const res = await verifyOtp({ code: otpCode });
-      if (res.data.success) {
+      const data = await response.json();
+      // return data;
+
+      // const res = await verifyOtp({ code: otpCode });
+      if (data.success) {
         // Mark in Firestore
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
@@ -86,12 +81,76 @@ const PhoneAuthScreen: React.FC = () => {
       } else {
         throw new Error("Invalid code");
       }
-    } catch (err: any) {
-      Alert.alert("Error verifying OTP", err.message || "Verification failed");
-    } finally {
-      setLoading(false);
+
+    } catch (error) {
+      console.error('Verify OTP failed:', error);
+      return { success: false };
+    }
+    finally {
+      setLoading(false)
     }
   };
+
+
+  // const handleSendCode = async (phone: string) => {
+  //   setLoading(true);
+  //   try {
+  //     // Ensure user is signed in
+  //     const user = auth.currentUser;
+  //     if (!user) throw new Error("User must be signed in");
+  
+  //     // Call your Firebase Function
+  //     const sendOtp = httpsCallable<{ phoneNumber: string }, { success: boolean }>(
+  //       functions,
+  //       "sendOtpToPhone"
+  //     );
+  //     const res = await sendOtp({ phoneNumber: phone });
+  //     if (res.data.success) {
+  //       setPhoneNumber(phone);
+  //       setStep("enterCode");
+  //     } else {
+  //       throw new Error("Failed to send OTP");
+  //     }
+  //   } catch (err: any) {
+  //     Alert.alert("Error sending OTP", err.message || "Unable to send code");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
+
+  // const handleVerifyCode = async (otpCode: string) => {
+  //   if (!phoneNumber) return;
+  //   setLoading(true);
+  //   try {
+  //     // Ensure user is signed in
+  //     const user = auth.currentUser;
+  //     if (!user) throw new Error("User must be signed in");
+  
+  //     // Call your Firebase Function
+  //     const verifyOtp = httpsCallable<{ code: string }, { success: boolean }>(
+  //       functions,
+  //       "verifyOtpCode"
+  //     );
+  //     const res = await verifyOtp({ code: otpCode });
+  //     if (res.data.success) {
+  //       // Mark in Firestore
+  //       const userRef = doc(db, "users", user.uid);
+  //       await updateDoc(userRef, {
+  //         phoneNumber,
+  //         phoneNumberVerified: true,
+  //       });
+  //       Alert.alert("Success", "Phone number verified!");
+  //       router.push("/(auth)/register/contacts-verification");
+  //     } else {
+  //       throw new Error("Invalid code");
+  //     }
+  //   } catch (err: any) {
+  //     Alert.alert("Error verifying OTP", err.message || "Verification failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   
 
   // const handleSendCode = async (phone: string) => {
