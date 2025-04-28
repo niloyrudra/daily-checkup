@@ -2,7 +2,7 @@ import {initializeApp} from "firebase/app";
 import "firebase/functions";
 import { getAuth, sendEmailVerification, signInWithEmailAndPassword, createUserWithEmailAndPassword, User, initializeAuth, RecaptchaVerifier, signInWithPhoneNumber, PhoneAuthProvider, signInWithCredential } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getAnalytics } from "firebase/analytics";
+// import { getAnalytics } from "firebase/analytics";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 import Constants from "expo-constants";
@@ -27,7 +27,7 @@ const auth = getAuth(app);
 // Initialize Firebase Functions
 const functions = getFunctions(app, "us-central1");
 const db = getFirestore(app);
-const analytics = getAnalytics(app);
+// const analytics = getAnalytics(app);
 export type AuthUser = User | null;
 
 export {
@@ -37,7 +37,7 @@ export {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   functions,
-  analytics,
+  // analytics,
   httpsCallable,
   RecaptchaVerifier,
   signInWithPhoneNumber,

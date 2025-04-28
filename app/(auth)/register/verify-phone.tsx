@@ -12,6 +12,7 @@ import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButto
 import TextInputComponent from "@/components/form-components/TextInputComponent";
 import STYLES from "@/constants/styles";
 import { BASE_URL } from "@/config/config";
+import SIZES from "@/constants/size";
 
 const F_BASE_API_KEY = process.env.FIREBASE_API_KEY;
 
@@ -230,7 +231,7 @@ const PhoneAuthScreen: React.FC = () => {
         {({ handleChange, handleSubmit, values, errors, touched }) => (
           <View style={STYLES.container}>
             {step === 'enterPhone' ? (
-              <View style={{ gap: 20 }}>
+              <View style={{ gap: 20, width: SIZES.screenBodyWidth }}>
                 <View>
                   <Text style={{ marginBottom: 15 }}>Phone Number:</Text>
                   <TextInputComponent
@@ -270,6 +271,7 @@ const PhoneAuthScreen: React.FC = () => {
           </View>
         )}
       </Formik>
+
     </AuthScreenLayout>
   );
 };

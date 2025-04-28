@@ -1,4 +1,4 @@
-import { StatusBar } from 'react-native';
+import { Alert, Linking, StatusBar } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -12,6 +12,8 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 import { Theme } from '@/constants/theme';
+import React from 'react';
+import { parse } from 'expo-linking';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,7 +37,22 @@ export default function RootLayout() {
   //   const subscription = Linking.addEventListener("url", handleDeepLink);
   //   return () => subscription.remove();
   // }, []);
+  useEffect(() => {
+    const subscription = Linking.addEventListener('url', (event) => {
+      const url = event.url;
+      const { queryParams } = parse(url);
+      if (queryParams?.status === 'success') {
+        Alert.alert("✅ Payment Successful", "Thanks for subscribing!");
+      } else if (queryParams?.status === 'cancel') {
+        Alert.alert("❌ Payment Cancelled", "You can try again later.");
+      }
+    });
 
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+  
   useEffect(() => {
     const hideSplash = async () => {
       if (!loaded) {

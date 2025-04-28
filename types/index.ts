@@ -9,36 +9,39 @@ type WritableTimestamp = Timestamp | FieldValue;
 type Plan = "free" | "monthly" | "yearly";
 
 type Contact = {
-  phoneNumber: string;
-  verified: boolean;
-};
+  contactName?: string,
+  phoneNumber: string,
+  verified: boolean,
+}
 
 type MembershipPlan = {
-  plan: Plan;
-  status: "active" | "canceled" | "trialing" | "pending";
-  since: WritableTimestamp;
-};
+  plan: Plan,
+  status: "active" | "canceled" | "trialing" | "pending",
+  since: WritableTimestamp
+}
 
 type UserData = {
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  phoneNumber: string;
-  phoneNumberVerified: boolean;
+  name: string,
+  zipCode: string,
+  country: string,
+  email: string,
+  emailVerified: boolean,
+  phoneNumber: string,
+  phoneNumberVerified: boolean,
   
   // Two distinct contacts
   contactNumbers: {
-    contact1: Contact;
-    contact2: Contact;
-  };
-  contactNumbersVerified: boolean;  
+    contact1: Contact,
+    contact2: Contact,
+  },
+  contactNumbersVerified: boolean,  
 
   // any schedule flags by id
-  schedules: Record<string, boolean>;
+  schedules: Record<string, boolean>,
 
-  membershipPlan: MembershipPlan;
-  createdAt: WritableTimestamp;
-};
+  membershipPlan: MembershipPlan,
+  createdAt: WritableTimestamp
+}
 
 
 

@@ -19,6 +19,8 @@ const UserInfoScreenSchema = Yup.object().shape({
     name: Yup.string().min(2, "Name must be at least 2 characters").required("Name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+    zipCode: Yup.string().min(2, "Name must be at least 2 characters").required("Zip Code is required"),
+    country: Yup.string().required("Country is required"),
 });
 
 const defaultMembershipPlan: MembershipPlan = {
@@ -33,6 +35,8 @@ const UserInfoScreen: React.FC = () => {
 
   const handleUserInfoScreen = async (
     name: string,
+    zipCode: string,
+    country: string,
     email: string,
     password: string
   ) => {
@@ -53,14 +57,16 @@ const UserInfoScreen: React.FC = () => {
       // 2️⃣ Build UserData with Firestore serverTimestamp
       const userData: UserData = {
         name,
+        zipCode,
+        country,
         email,
         emailVerified: false,
         phoneNumber: "",
         phoneNumberVerified: false,
         contactNumbersVerified: false,
         contactNumbers: {
-          contact1: { phoneNumber: "", verified: false },
-          contact2: { phoneNumber: "", verified: false }
+          contact1: { contactName: "", phoneNumber: "", verified: false },
+          contact2: { contactName: "", phoneNumber: "", verified: false }
         },
         schedules: {},
         createdAt: serverTimestamp(),       // ← server timestamp :contentReference[oaicite:9]{index=9}
@@ -85,9 +91,9 @@ const UserInfoScreen: React.FC = () => {
     <AuthScreenLayout title="Sign Up">
 
       <Formik
-        initialValues={{ name: "", email: "", password: "" }}
+        initialValues={{ name: "", zipCode: "", country: "", email: "", password: "" }}
         validationSchema={UserInfoScreenSchema}
-        onSubmit={(values) => handleUserInfoScreen(values.name, values.email, values.password)}
+        onSubmit={(values) => handleUserInfoScreen(values.name, values.zipCode, values.country, values.email, values.password)}
       >
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
           <View
@@ -122,6 +128,24 @@ const UserInfoScreen: React.FC = () => {
               onBlur={handleBlur("password")}
             />
             {errors.password && touched.password && <Text>{errors.password}</Text>}
+
+            <TextInputComponent
+              placeholder="1234 5678"
+              inputMode="text"
+              value={values.zipCode}
+              onChange={handleChange("zipCode")}
+              onBlur={handleBlur("zipCode")}
+            />
+            {errors.zipCode && touched.zipCode && <Text>{errors.zipCode}</Text>}
+
+            <TextInputComponent
+              placeholder="Country Name"
+              inputMode="text"
+              value={values.country}
+              onChange={handleChange("country")}
+              onBlur={handleBlur("country")}
+            />
+            {errors.country && touched.country && <Text>{errors.country}</Text>}
 
             {/* Submit Button */}
             <ActionPrimaryButton
