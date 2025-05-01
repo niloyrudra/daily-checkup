@@ -37,22 +37,46 @@ export default function RootLayout() {
   //   const subscription = Linking.addEventListener("url", handleDeepLink);
   //   return () => subscription.remove();
   // }, []);
-  useEffect(() => {
-    const subscription = Linking.addEventListener('url', (event) => {
-      const url = event.url;
-      const { queryParams } = parse(url);
-      if (queryParams?.status === 'success') {
-        Alert.alert("✅ Payment Successful", "Thanks for subscribing!");
-      } else if (queryParams?.status === 'cancel') {
-        Alert.alert("❌ Payment Cancelled", "You can try again later.");
-      }
-    });
+  // useEffect(() => {
+  //   const subscription = Linking.addEventListener('url', (event) => {
+  //     const url = event.url;
+  //     const { queryParams } = parse(url);
+  //     if (queryParams?.status === 'success') {
+  //       Alert.alert("✅ Payment Successful", "Thanks for subscribing!");
+  //     } else if (queryParams?.status === 'cancel') {
+  //       Alert.alert("❌ Payment Cancelled", "You can try again later.");
+  //     }
+  //   });
 
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, []);
+  
+  useEffect(() => {
+    const handleDeepLink = (event: { url: any; }) => {
+      const data = parse(event.url);
+      console.log("Received deep link:", data);
+      if (data.queryParams?.status === "success") {
+        Alert.alert("Success", "Payment completed successfully!");
+        router.replace("/dashboard/home"); // or wherever appropriate
+      } else if (data.queryParams?.status === "cancel") {
+        Alert.alert("Cancelled", "Payment was cancelled.");
+      }
+    };
+  
+    const subscription = Linking.addEventListener('url', handleDeepLink);
+  
+    // Check if app was launched by a deep link
+    Linking.getInitialURL().then((url) => {
+      if (url) handleDeepLink({ url });
+    });
+  
     return () => {
       subscription.remove();
     };
   }, []);
-  
+
   useEffect(() => {
     const hideSplash = async () => {
       if (!loaded) {
@@ -87,10 +111,11 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="dashboard/home" options={{ headerShown: false }} />
+        <Stack.Screen name="dashboard/home" options={{ headerShown: true }} />
         <Stack.Screen name="+not-found" />
       </Stack>
-      <StatusBar barStyle="dark-content" backgroundColor={Theme.background} />
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      {/* <StatusBar barStyle="dark-content" backgroundColor={Theme.background} /> */}
     </ThemeProvider>
   );
 }

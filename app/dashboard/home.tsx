@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Image } from "react-native";
+import { ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { auth, db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -45,7 +45,7 @@ const DashboardScreen: React.FC = () => {
         </MotiView>
 
         {/* User Info Card */}
-        <Card style={{ backgroundColor: "#1E1E1E", marginBottom: 20 }}>
+        <Card style={{ backgroundColor: "transparent", marginBottom: 20 }}>
           <Card.Title
             title={userData?.name || userData?.email || "User"}
             subtitle={userData?.emailVerified ? "Email: Verified ✅" : "Email: Unverified ❌"}

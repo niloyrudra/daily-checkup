@@ -3,9 +3,9 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
+// import axios from "axios";
 import { doc, updateDoc } from "firebase/firestore";
-import { auth, db, functions, httpsCallable,  } from "@/config/firebase";
+import { auth, db  } from "@/config/firebase";
 
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
@@ -14,7 +14,19 @@ import STYLES from "@/constants/styles";
 import { BASE_URL } from "@/config/config";
 import SIZES from "@/constants/size";
 
-const F_BASE_API_KEY = process.env.FIREBASE_API_KEY;
+// const F_BASE_API_KEY = process.env.FIREBASE_API_KEY;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface SendOtpErrType {status: number, code: number | null, moreInfo: string}
+
+interface ErrorMsg {
+  21408: string,
+  21610: string,
+  21614: string,
+  20429: string,
+  60200: string,
+  60203: string,
+  20404: string,
+};
 
 const phoneSchema = Yup.object().shape({
   phone: Yup.string()
@@ -27,6 +39,7 @@ const phoneSchema = Yup.object().shape({
 
 const PhoneAuthScreen: React.FC = () => {
   const router = useRouter();
+  const user = auth.currentUser;
   const [loading, setLoading] = useState<boolean>(false);
   // const [sessionInfo, setSessionInfo] = useState<string | null>(null);
   const [step, setStep] = useState<'enterPhone' | 'enterCode'>('enterPhone');
@@ -34,6 +47,7 @@ const PhoneAuthScreen: React.FC = () => {
 
 
   const handleSendCode = async (phoneNumber: string) => {
+    if(!user) return Alert.alert("Invalid User")
     setLoading(true)
     try {
       setPhoneNumber( prevValue => prevValue = phoneNumber )
@@ -43,12 +57,45 @@ const PhoneAuthScreen: React.FC = () => {
         body: JSON.stringify({ phone: phoneNumber }),
       });
   
+      // const data = await response.json();
       const data = await response.json();
       setStep("enterCode");
-      return data;
-    } catch (error) {
+
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        phoneNumber,
+        phoneNumberVerified: false,
+      });
+
+      if( data?.error?.status === 400 ) {
+        const errorMap: ErrorMsg = {
+          21408: 'Permission denied: We are not allowed to send SMS to this country.',
+          21610: 'User has opted out of messages (replied STOP). They must reply START to your Twilio number to allow messages again.',
+          21614: 'Invalid phone number. Please verify it is a real mobile number in E.164 format.',
+          20429: 'Too many OTP requests. Please wait a while before trying again.',
+          60200: 'Invalid phone number format.',
+          60203: 'Your phone number is blacklisted.',
+          20404: 'Verification SID not found or deleted.',
+        };
+        const userMessage = errorMap[data?.error?.code] || data?.message;
+        Alert.alert(userMessage)
+      }
+
+      // return data;
+    } catch (error: any | SendOtpErrType) {
       console.error('Send OTP failed:', error);
-      return { success: false };
+      const errorMap: ErrorMsg = {
+        21408: 'Permission denied: We are not allowed to send SMS to this country.',
+        21610: 'User has opted out of messages (replied STOP). They must reply START to your Twilio number to allow messages again.',
+        21614: 'Invalid phone number. Please verify it is a real mobile number in E.164 format.',
+        20429: 'Too many OTP requests. Please wait a while before trying again.',
+        60200: 'Invalid phone number format.',
+        60203: 'Your phone number is blacklisted.',
+        20404: 'Verification SID not found or deleted.',
+      };
+      const userMessage = errorMap[error?.code] || error.message;
+      Alert.alert(userMessage)
+
     }
     finally {
       setLoading(false)
@@ -56,9 +103,10 @@ const PhoneAuthScreen: React.FC = () => {
   };
 
   const handleVerifyCode = async (otp: string) => {
+    if(!user) return Alert.alert("Invalid User")
     setLoading(true)
     try {
-      const user = auth.currentUser;
+      
       if (!user) throw new Error("User must be signed in");
       const response = await fetch(`${BASE_URL}/api/verify-otp`, {
         method: 'POST',
