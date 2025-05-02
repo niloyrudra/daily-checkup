@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { auth, db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -10,6 +10,8 @@ import { MotiView } from "moti";
 import CalendarComponent from "@/components/dashboard/Calendar";
 import SafeAreaLayout from "@/components/layout/SafeAreaLayout";
 import { Theme } from "@/constants/theme";
+import STYLES from "@/constants/styles";
+import SIZES from "@/constants/size";
 
 const DashboardScreen: React.FC = () => {
   const router = useRouter();
@@ -38,14 +40,14 @@ const DashboardScreen: React.FC = () => {
           transition={{ type: "spring", duration: 500 }}
           style={{ marginBottom: 20 }}
         >
-          <Title style={{ color: Theme.primary, fontSize: 28 }}>Welcome,</Title>
+          <Title style={{ color: Theme.text, fontSize: 28 }}>Welcome,</Title>
           <Paragraph style={{ color: "green", fontSize: 18 }}> {/* "#aaa" */}
             {userData?.name || userData?.email || "User"}
           </Paragraph>
         </MotiView>
 
         {/* User Info Card */}
-        <Card style={{ backgroundColor: "transparent", marginBottom: 20 }}>
+        <Card style={[styles.card, {padding: 0}]}>
           <Card.Title
             title={userData?.name || userData?.email || "User"}
             subtitle={userData?.emailVerified ? "Email: Verified ✅" : "Email: Unverified ❌"}
@@ -56,19 +58,19 @@ const DashboardScreen: React.FC = () => {
                 size={50}
               />
             )}
-            titleStyle={{ color: "white" }}
+            titleStyle={{ color: Theme.text }}
             subtitleStyle={{ color: "#aaa" }}
           />
         </Card>
 
         {/* Phone Number Status */}
-        <Title style={{ color: Theme.primary, fontSize: 20, marginBottom: 10 }}>
+        <Title style={{ color: Theme.text, fontSize: 20, marginBottom: 10 }}>
           Phone Number
         </Title>
-        <Card style={{ backgroundColor: "#1E1E1E", marginBottom: 20, padding: 10 }}>
+        <Card style={styles.card}>
           {userData?.phoneNumber ? (
                 <Card.Content style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 5 }}>
-                  <Text style={{ color: "white" }}>{userData.phoneNumber}</Text>
+                  <Text style={{ color: Theme.text }}>{userData.phoneNumber}</Text>
                   {userData?.phoneNumberVerified ? (
                     <FontAwesome5 name="check-circle" size={20} color="green" />
                   ) : (
@@ -81,16 +83,16 @@ const DashboardScreen: React.FC = () => {
           )}
         </Card>
 
-        {/* Friend Verification Status */}
-        <Title style={{ color: Theme.primary, fontSize: 20, marginBottom: 10 }}>
-          Friend Verification
+        {/* Contact Information Status */}
+        <Title style={{ color: Theme.text, fontSize: 20, marginBottom: 10 }}>
+          Contact Information
         </Title>
-        <Card style={{ backgroundColor: "#1E1E1E", marginBottom: 20, padding: 10 }}>
+        <Card style={styles.card}>
           {userData?.contactNumbers.contact1.phoneNumber || userData?.contactNumbers.contact2.phoneNumber ? (
             Object.entries(userData.contactNumbers).map(([phoneNumber, contactName, verified=false], index) => (
               <React.Fragment key={index}>
                 <Card.Content style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 5 }}>
-                  <Text style={{ color: "white" }}>{`Contact #${index}`}: {phoneNumber}</Text>
+                  <Text style={{ color: Theme.text }}>{`Contact #${index}`}: {phoneNumber}</Text>
                   {verified ? (
                     <FontAwesome5 name="check-circle" size={20} color="green" />
                   ) : (
@@ -103,7 +105,7 @@ const DashboardScreen: React.FC = () => {
               </React.Fragment>
             ))
           ) : (
-            <Paragraph style={{ color: "#aaa" }}>No friends verified yet.</Paragraph>
+            <Paragraph style={{ color: "#aaa" }}>No contact(s) verified yet.</Paragraph>
           )}
         </Card>
 
@@ -116,11 +118,12 @@ const DashboardScreen: React.FC = () => {
           <Button
             mode="contained"
             buttonColor="#1E88E5"
-            style={{ marginBottom: 10 }}
+            style={[STYLES.actionButtonTextStyle, { marginBottom: 10 }]}
             // onPress={() => router.push("/(auth)/register/add-friends")}
             onPress={() => router.push("/(auth)/register/contacts-verification")}
           >
-            Verify More Friends
+            <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", paddingVertical: 3}}>Verify More Friends</Text>
+            
           </Button>
           <Button
             mode="contained"
@@ -130,13 +133,13 @@ const DashboardScreen: React.FC = () => {
               router.replace("/(auth)/login");
             }}
           >
-            Signout
+            <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", paddingVertical: 3}}>Signout</Text>
           </Button>
         </MotiView>
 
         {/* Scheduler Section */}
         <MotiView style={{ marginTop: 30 }}>
-          <Title style={{ color: Theme.primary, fontSize: 22, marginBottom: 10 }}>Set Your Schedule</Title>
+          <Title style={{ color: Theme.text, fontSize: 22, marginBottom: 10 }}>Set Your Schedule</Title>
           <CalendarComponent />
         </MotiView>
       </ScrollView>
@@ -146,3 +149,13 @@ const DashboardScreen: React.FC = () => {
 };
 
 export default DashboardScreen;
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "transparent",
+    marginBottom: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#aaa"
+  }
+});

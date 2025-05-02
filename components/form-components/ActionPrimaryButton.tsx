@@ -22,11 +22,11 @@ const ActionPrimaryButton = ( {
                 
     return (
         <TouchableOpacity
-            style={[ STYLES.childContentCentered, STYLES.boxShadow, styles.content, {backgroundColor: "#2f7d32"}, (buttonStyle && buttonStyle)]} // "#0a7ea4"
+            style={[ STYLES.childContentCentered, STYLES.boxShadow, styles.content, {backgroundColor: "red"/*"#2f7d32"*/}, (buttonStyle && buttonStyle)]} // "#0a7ea4"
             onPress={onSubmit}
             disabled={disabled}
         >
-            <Text style={[{fontSize: 16, color: "#FFFFFF", fontWeight: "800"}, (buttonTextStyle && buttonTextStyle)]}>{buttonTitle}</Text>
+            <Text style={[STYLES.actionButtonTextStyle, (buttonTextStyle && buttonTextStyle)]}>{buttonTitle}</Text>
         </TouchableOpacity>
     );
 }

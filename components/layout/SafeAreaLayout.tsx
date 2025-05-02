@@ -11,7 +11,7 @@ const SafeAreaLayout = ({children}: {children: ReactNode}) => {
     <SafeAreaProvider>
       <SafeAreaView style={{flex:1}}>
         {/* <GradientWrapper> */}
-        <View style={[STYLES.defaultContainer]}>
+        <View style={[STYLES.defaultContainer, {backgroundColor: "#FFFFFF"}]}>
 
           {children && children}
           

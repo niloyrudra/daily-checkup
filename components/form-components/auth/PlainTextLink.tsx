@@ -16,10 +16,10 @@ const PlainTextLink = ({text, linkText, route}: LinkProps) => {
           gap: 4
         }}
       >
-        <Text style={{color: Theme.primary}}>{text}</Text>
+        <Text style={{color: Theme.text, fontSize: 16}}>{text}</Text>
         <Link
           href={route}
-          style={{color: Theme.link, fontWeight: "800"}}
+          style={{color: Theme.text, fontSize: 16, fontWeight: "700"}}
         >
           {linkText}
         </Link>

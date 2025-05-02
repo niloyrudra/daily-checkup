@@ -10,6 +10,7 @@ import TextInputComponent from "@/components/form-components/TextInputComponent"
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import PlainTextLink from "@/components/form-components/auth/PlainTextLink";
+import { Theme } from "@/constants/theme";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -70,7 +71,7 @@ const Login: React.FC = () => {
                 alignItems: "flex-end",
               }}
             >
-              <Link href="/(auth)/forgot-password" style={{color: "#d1b48c", fontWeight: "800"}}>Forgot Password?</Link>
+              <Link href="/(auth)/forgot-password" style={{color: Theme.text, fontSize: 16, fontWeight: "600"}}>Forgot Password?</Link>
             </View>
 
             {/* Submit Button */}
@@ -85,7 +86,7 @@ const Login: React.FC = () => {
       </Formik>
 
       {/* <PlainTextLink text="Don't have an account?" route="/(auth)/signup" linkText="Create Account." /> */}
-      <PlainTextLink text="Don't have an account?" route="/(auth)/register" linkText="Create Account." />
+      <PlainTextLink  text="Don't have an account?" route="/(auth)/register" linkText="Create Account." />
 
     </AuthScreenLayout>
   );

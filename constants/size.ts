@@ -25,6 +25,7 @@ const SIZES = {
     topProgressBarHeight: 12,
 
     // Fonts
+    buttonFontSize: 16,
     fontSizeTextArea: 24,
     fontSizeTextInput: 16,
 

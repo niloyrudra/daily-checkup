@@ -105,13 +105,14 @@ export default function RootLayout() {
         screenOptions={{
           contentStyle: {
             // marginTop: StatusBar.currentHeight || 0,
-            backgroundColor: `${Theme.background}`
+            // backgroundColor: `${Theme.background}`
+            backgroundColor: "#FFFFFF"
           }
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="dashboard/home" options={{ headerShown: true }} />
+        <Stack.Screen name="dashboard" />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />

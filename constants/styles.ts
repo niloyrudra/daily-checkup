@@ -1,4 +1,4 @@
-import { StyleProp, ViewProps, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, ViewProps, ViewStyle } from "react-native";
 import SIZES from "@/constants/size";
 
 const headerContainer: StyleProp<ViewProps> = {
@@ -69,6 +69,12 @@ const subTitleHeadingStyle: StyleProp<ViewProps> = {
     fontFamily: 'PlusJakartaSans-Bold',
 } as ViewProps;
 
+const actionButtonTextStyle: StyleProp<TextStyle> = {
+    fontSize: SIZES.buttonFontSize,
+    color: "#FFFFFF",
+    fontWeight: "600"
+} as ViewProps;
+
 
 const STYLES = {
     container,
@@ -81,7 +87,8 @@ const STYLES = {
     contentCentered,
     childContentCentered,
     titleHeadingStyle,
-    subTitleHeadingStyle
+    subTitleHeadingStyle,
+    actionButtonTextStyle
 };
 
 export default STYLES;

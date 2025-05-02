@@ -9,7 +9,7 @@ const TitleComponent = ({title, style, titleStyle}: {title: string, style?: Styl
         style && style
       ]}
     >
-      <Text style={[{color: Theme.primary, fontSize:24, fontWeight: "800" }, (titleStyle && titleStyle)]}>
+      <Text style={[{color: Theme.text, fontSize:24, fontWeight: "800" }, (titleStyle && titleStyle)]}>
         {title}
       </Text>
     </View>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, Alert } from "react-native";
+import { View, Alert, TouchableOpacity, Text } from "react-native";
 import { Calendar } from "react-native-calendars";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
@@ -10,6 +10,7 @@ import { router } from "expo-router";
 import ActionPrimaryButton from "../form-components/ActionPrimaryButton";
 import { Paragraph } from "react-native-paper";
 import { Theme } from "@/constants/theme";
+import SIZES from "@/constants/size";
 
 // Define the shape of marked dates
 interface MarkedDates {
@@ -82,8 +83,42 @@ const CalendarComponent: React.FC = () => {
             <Calendar
                 onDayPress={(day: DateObject) => toggleDay(day.dateString)}
                 markedDates={selectedDays}
+                style={{
+                    // backgroundColor: "red",
+                    borderWidth: 1,
+                    borderColor: "#aaa",
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                }}
+                // theme={{
+                //     backgroundColor: '#ffffff',
+                //     calendarBackground: '#ffffff',
+                //     textSectionTitleColor: '#b6c1cd',
+                //     selectedDayBackgroundColor: '#00adf5',
+                //     selectedDayTextColor: '#ffffff',
+                //     todayTextColor: '#00adf5',
+                //     dayTextColor: '#2d4150',
+                //     textDisabledColor: '#dd99ee'
+                // }}
             />
-            <Button title="Pick Reminder Time" onPress={() => setShowPicker(true)} />
+
+            {/* <Button
+                title="Pick Reminder Time"
+                onPress={() => setShowPicker(true)}
+            /> */}
+
+            <TouchableOpacity
+                style={{
+                    backgroundColor: "#1E88E5",
+                    paddingVertical: 10,
+                    borderBottomLeftRadius: 20,
+                    borderBottomRightRadius: 20,
+                }}
+                onPress={() => setShowPicker(true)}
+            >
+                <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", textAlign:"center", fontWeight: "600"}}>Pick Reminder Time</Text>
+            </TouchableOpacity>
+
             {showPicker && (
                 <DateTimePicker
                 value={time}
@@ -93,7 +128,7 @@ const CalendarComponent: React.FC = () => {
             )}
             {/* <Text>Selected Time: {time.toLocaleTimeString()}</Text> */}
             <View style={{marginVertical: 20}}>
-                <Paragraph style={{color: Theme.secondary}}>Selected Time: {time.toLocaleTimeString()}</Paragraph>
+                <Paragraph style={{color: Theme.text, fontSize: 16}}>Selected Time: {time.toLocaleTimeString()}</Paragraph>
             </View>
             {/* <Button title="Save Schedule" onPress={saveSchedule} /> */}
             <ActionPrimaryButton buttonTitle="Save Schedule" onSubmit={saveSchedule}/>
