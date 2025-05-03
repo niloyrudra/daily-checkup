@@ -40,7 +40,8 @@ type UserData = {
   schedules: Record<string, boolean>,
 
   membershipPlan: MembershipPlan,
-  createdAt: WritableTimestamp
+  createdAt: WritableTimestamp,
+  state?: null | undefined | boolean
 }
 
 

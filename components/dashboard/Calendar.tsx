@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { View, Alert, TouchableOpacity, Text } from "react-native";
 import { Calendar } from "react-native-calendars";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-
-// import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
 import { auth, db } from "@/config/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { router } from "expo-router";
+// import { router } from "expo-router";
 import ActionPrimaryButton from "../form-components/ActionPrimaryButton";
 import { Paragraph } from "react-native-paper";
 import { Theme } from "@/constants/theme";
@@ -32,6 +30,7 @@ const CalendarComponent: React.FC = () => {
     const [selectedDays, setSelectedDays] = useState<MarkedDates>({});
     const [time, setTime] = useState<Date>(new Date());
     const [showPicker, setShowPicker] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false)
 
     const toggleDay = (day: string) => {
             setSelectedDays((prev) => ({
@@ -46,19 +45,32 @@ const CalendarComponent: React.FC = () => {
             return;
         }
 
+        setLoading(true)
+
         try {
             const user = auth.currentUser;
             if (!user) throw new Error("Not logged in");
 
-            await setDoc(doc(db, "schedules", user.uid), {
-                days: Object.keys(selectedDays),
-                time: time.toISOString(),
+            await setDoc(doc(db, "users", user.uid), {
+                schedules: [
+                    {
+                        days: Object.keys(selectedDays),
+                        time: time.toISOString(),
+                    }
+                ]
             });
+            // await setDoc(doc(db, "schedules", user.uid), {
+            //     days: Object.keys(selectedDays),
+            //     time: time.toISOString(),
+            // });
 
             Alert.alert("Schedule saved!");
-            router.push("/dashboard/home"); // added slash to fix router path
+            // router.push("/dashboard/home"); // added slash to fix router path
         } catch (error: any) {
             Alert.alert("Error", error.message || "Something went wrong.");
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -79,7 +91,6 @@ const CalendarComponent: React.FC = () => {
 
     return (
         <View style={{ flex: 1, paddingVertical: 20 }}>
-            {/* <Text>Select Days:</Text> */}
             <Calendar
                 onDayPress={(day: DateObject) => toggleDay(day.dateString)}
                 markedDates={selectedDays}
@@ -87,8 +98,10 @@ const CalendarComponent: React.FC = () => {
                     // backgroundColor: "red",
                     borderWidth: 1,
                     borderColor: "#aaa",
-                    borderTopLeftRadius: 20,
-                    borderTopRightRadius: 20,
+                    borderRadius: 25,
+                    margnBottom: 20
+                    // borderTopLeftRadius: 20,
+                    // borderTopRightRadius: 20,
                 }}
                 // theme={{
                 //     backgroundColor: '#ffffff',
@@ -109,14 +122,16 @@ const CalendarComponent: React.FC = () => {
 
             <TouchableOpacity
                 style={{
-                    backgroundColor: "#1E88E5",
-                    paddingVertical: 10,
-                    borderBottomLeftRadius: 20,
-                    borderBottomRightRadius: 20,
+                    backgroundColor: Theme.primary, // "#1E88E5",
+                    paddingVertical: 12,
+                    marginTop: 20,
+                    borderRadius: 30
+                    // borderBottomLeftRadius: 20,
+                    // borderBottomRightRadius: 20,
                 }}
                 onPress={() => setShowPicker(true)}
             >
-                <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", textAlign:"center", fontWeight: "600"}}>Pick Reminder Time</Text>
+                <Text style={{fontSize: SIZES.title, color: "#FFFFFF", textAlign:"center", fontWeight: "400"}}>Pick Reminder Time</Text>
             </TouchableOpacity>
 
             {showPicker && (
@@ -127,11 +142,15 @@ const CalendarComponent: React.FC = () => {
                 />
             )}
             {/* <Text>Selected Time: {time.toLocaleTimeString()}</Text> */}
-            <View style={{marginVertical: 20}}>
-                <Paragraph style={{color: Theme.text, fontSize: 16}}>Selected Time: {time.toLocaleTimeString()}</Paragraph>
+            <View style={{marginVertical: 30}}>
+                <Paragraph style={{color: Theme.text, fontSize: SIZES.title}}>Selected Time: {time.toLocaleTimeString()}</Paragraph>
             </View>
             {/* <Button title="Save Schedule" onPress={saveSchedule} /> */}
-            <ActionPrimaryButton buttonTitle="Save Schedule" onSubmit={saveSchedule}/>
+            <ActionPrimaryButton
+                buttonTitle="Save Schedule"
+                onSubmit={saveSchedule}
+                isLoading={loading}
+            />
         </View>
     );
 };

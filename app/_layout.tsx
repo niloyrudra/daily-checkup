@@ -1,3 +1,4 @@
+// import "dotenv/config"
 import { Alert, Linking, StatusBar } from 'react-native';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -112,7 +113,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="dashboard" />
+        <Stack.Screen name="dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />

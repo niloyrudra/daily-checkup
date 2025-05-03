@@ -5,6 +5,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useRouter } from "expo-router";
 import AuthScreenLayout from "@/components/layout/AuthScreenLayout";
 import ActionPrimaryButton from "@/components/form-components/ActionPrimaryButton";
+import SIZES from "@/constants/size";
 
 const VerifyEmail: React.FC = () => {
   const [verified, setVerified] = useState<boolean>(false);
@@ -34,14 +35,9 @@ const VerifyEmail: React.FC = () => {
             gap: 6
           }}
         >
-
-          <Text>{verified ? "Email Verified!" : "Waiting for email verification..."}</Text>
+          <Text style={[{fontSize: SIZES.contentText}, (verified && {color: "green"})]}>{verified ? "Email Verified!" : "Waiting for email verification..."}</Text>
           {!verified && (<ActivityIndicator size={24} color="blue" />)}
-
-
         </View>
-        {/* {verified && <Button title="Continue" onPress={() => router.push("/(auth)/verify-friend")} />} */}
-        {/* {verified && <Button title="Continue" onPress={() => router.push("/(auth)/complete-profile")} />} */}
         {verified && <ActionPrimaryButton buttonTitle="Continue" onSubmit={() => router.push("/(auth)/register/verify-phone")} />}
       </View>
     </AuthScreenLayout>

@@ -20,18 +20,15 @@ const SIZES = {
     SpeakerIcon: 20,
     cardGap: 12,
     marginBottom: 20,
-    speakerNRecorderDimensions: 60,
-
-    topProgressBarHeight: 12,
 
     // Fonts
-    buttonFontSize: 16,
+    buttonFontSize: 22,
     fontSizeTextArea: 24,
-    fontSizeTextInput: 16,
+    fontSizeTextInput: 18,
 
-    // Card
-    gridCardIconWrapDimension: 80,
-    gridCardIconDimension: 56
+    header: 28,
+    title: 22,
+    contentText: 18,
 }
 
 export default SIZES;

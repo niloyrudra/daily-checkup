@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword, sendEmailVerification, User } from "firebase/auth";
 import { auth, db, functions } from "@/config/firebase";
@@ -90,75 +90,80 @@ const UserInfoScreen: React.FC = () => {
   return (
     <AuthScreenLayout title="Sign Up">
 
-      <Formik
-        initialValues={{ name: "", zipCode: "", country: "", email: "", password: "" }}
-        validationSchema={UserInfoScreenSchema}
-        onSubmit={(values) => handleUserInfoScreen(values.name, values.zipCode, values.country, values.email, values.password)}
-      >
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-          <View
-            style={{
-              gap: 20,
-              width: SIZES.screenBodyWidth
-            }}
-          >
-            <TextInputComponent
-              placeholder="Full Name"
-              inputMode="text"
-              value={values.name}
-              onChange={handleChange("name")}
-              onBlur={handleBlur("name")}
-            />
-            {errors.name && touched.name && <Text>{errors.name}</Text>}
-            
-            <TextInputComponent
-              placeholder="Email"
-              inputMode="email"
-              value={values.email}
-              onChange={handleChange("email")}
-              onBlur={handleBlur("email")}
-            />
-            {errors.email && touched.email && <Text>{errors.email}</Text>}
+      <ScrollView style={{flex:1}}>
 
-            <TextInputComponent
-              placeholder="Password"
-              isPassword={true}
-              value={values.password}
-              onChange={handleChange("password")}
-              onBlur={handleBlur("password")}
-            />
-            {errors.password && touched.password && <Text>{errors.password}</Text>}
+        <Formik
+          initialValues={{ name: "", zipCode: "", country: "", email: "", password: "" }}
+          validationSchema={UserInfoScreenSchema}
+          onSubmit={(values) => handleUserInfoScreen(values.name, values.zipCode, values.country, values.email, values.password)}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            <View
+              style={{
+                gap: 20,
+                width: SIZES.screenBodyWidth
+              }}
+            >
+              <TextInputComponent
+                placeholder="Full Name"
+                inputMode="text"
+                value={values.name}
+                onChange={handleChange("name")}
+                onBlur={handleBlur("name")}
+              />
+              {errors.name && touched.name && <Text>{errors.name}</Text>}
+              
+              <TextInputComponent
+                placeholder="Email"
+                inputMode="email"
+                value={values.email}
+                onChange={handleChange("email")}
+                onBlur={handleBlur("email")}
+              />
+              {errors.email && touched.email && <Text>{errors.email}</Text>}
 
-            <TextInputComponent
-              placeholder="1234 5678"
-              inputMode="text"
-              value={values.zipCode}
-              onChange={handleChange("zipCode")}
-              onBlur={handleBlur("zipCode")}
-            />
-            {errors.zipCode && touched.zipCode && <Text>{errors.zipCode}</Text>}
+              <TextInputComponent
+                placeholder="Password"
+                isPassword={true}
+                value={values.password}
+                onChange={handleChange("password")}
+                onBlur={handleBlur("password")}
+              />
+              {errors.password && touched.password && <Text>{errors.password}</Text>}
 
-            <TextInputComponent
-              placeholder="Country Name"
-              inputMode="text"
-              value={values.country}
-              onChange={handleChange("country")}
-              onBlur={handleBlur("country")}
-            />
-            {errors.country && touched.country && <Text>{errors.country}</Text>}
+              <TextInputComponent
+                placeholder="1234 5678"
+                inputMode="text"
+                value={values.zipCode}
+                onChange={handleChange("zipCode")}
+                onBlur={handleBlur("zipCode")}
+              />
+              {errors.zipCode && touched.zipCode && <Text>{errors.zipCode}</Text>}
 
-            {/* Submit Button */}
-            <ActionPrimaryButton
-              buttonTitle="Sign Up"
-              onSubmit={handleSubmit}
-              isLoading={loading}
-            />
-            
-          </View>
-        )}
-      </Formik>
+              <TextInputComponent
+                placeholder="Country Name"
+                inputMode="text"
+                value={values.country}
+                onChange={handleChange("country")}
+                onBlur={handleBlur("country")}
+              />
+              {errors.country && touched.country && <Text>{errors.country}</Text>}
 
-      <PlainTextLink text="Already have an account?" route="/(auth)/login" linkText="Login here." />
+              
+              {/* Submit Button */}
+              <ActionPrimaryButton
+                buttonTitle="Sign Up"
+                onSubmit={handleSubmit}
+                isLoading={loading}
+              />
+
+            </View>
+          )}
+        </Formik>
+
+        <PlainTextLink text="Already have an account?" route="/(auth)/login" linkText="Login here." />
+      
+      </ScrollView>
 
     </AuthScreenLayout>
   );

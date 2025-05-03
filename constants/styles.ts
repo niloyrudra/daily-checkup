@@ -70,9 +70,9 @@ const subTitleHeadingStyle: StyleProp<ViewProps> = {
 } as ViewProps;
 
 const actionButtonTextStyle: StyleProp<TextStyle> = {
-    fontSize: SIZES.buttonFontSize,
+    fontSize: SIZES.title,
     color: "#FFFFFF",
-    fontWeight: "600"
+    fontWeight: "500"
 } as ViewProps;
 
 

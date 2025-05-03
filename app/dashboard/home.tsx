@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useRouter } from "expo-router";
 import { auth, db } from "@/config/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -33,6 +33,7 @@ const DashboardScreen: React.FC = () => {
     <SafeAreaLayout>
 
       <ScrollView style={{ flex: 1 }}>
+
         {/* Welcome Section */}
         <MotiView
           from={{ opacity: 0, translateY: -20 }}
@@ -40,8 +41,8 @@ const DashboardScreen: React.FC = () => {
           transition={{ type: "spring", duration: 500 }}
           style={{ marginBottom: 20 }}
         >
-          <Title style={{ color: Theme.text, fontSize: 28 }}>Welcome,</Title>
-          <Paragraph style={{ color: "green", fontSize: 18 }}> {/* "#aaa" */}
+          <Title style={{ color: Theme.text, fontSize: SIZES.header }}>Welcome,</Title>
+          <Paragraph style={{ color: "green", fontSize: SIZES.title }}> {/* "#aaa" */}
             {userData?.name || userData?.email || "User"}
           </Paragraph>
         </MotiView>
@@ -58,19 +59,28 @@ const DashboardScreen: React.FC = () => {
                 size={50}
               />
             )}
-            titleStyle={{ color: Theme.text }}
-            subtitleStyle={{ color: "#aaa" }}
+            titleStyle={{ color: Theme.text, fontSize: SIZES.title }}
+            subtitleStyle={{ color: "#aaa", fontSize: SIZES.contentText }}
           />
         </Card>
 
         {/* Phone Number Status */}
-        <Title style={{ color: Theme.text, fontSize: 20, marginBottom: 10 }}>
+        <Title style={{ color: Theme.text, fontSize: SIZES.title, marginBottom: 10 }}>
           Phone Number
         </Title>
         <Card style={styles.card}>
           {userData?.phoneNumber ? (
                 <Card.Content style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 5 }}>
-                  <Text style={{ color: Theme.text }}>{userData.phoneNumber}</Text>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      gap: 20
+                    }}
+                  >
+                    <FontAwesome5 name="phone-alt" size={20} />
+                    <Text style={{ color: Theme.text, fontSize: SIZES.contentText }}>{userData.phoneNumber}</Text>
+                  </View>
+
                   {userData?.phoneNumberVerified ? (
                     <FontAwesome5 name="check-circle" size={20} color="green" />
                   ) : (
@@ -84,7 +94,7 @@ const DashboardScreen: React.FC = () => {
         </Card>
 
         {/* Contact Information Status */}
-        <Title style={{ color: Theme.text, fontSize: 20, marginBottom: 10 }}>
+        <Title style={{ color: Theme.text, fontSize: SIZES.title, marginBottom: 10 }}>
           Contact Information
         </Title>
         <Card style={styles.card}>
@@ -105,7 +115,7 @@ const DashboardScreen: React.FC = () => {
               </React.Fragment>
             ))
           ) : (
-            <Paragraph style={{ color: "#aaa" }}>No contact(s) verified yet.</Paragraph>
+            <Paragraph style={{ color: "#aaa", fontSize: SIZES.contentText }}>No contact(s) verified yet.</Paragraph>
           )}
         </Card>
 
@@ -117,12 +127,12 @@ const DashboardScreen: React.FC = () => {
         >
           <Button
             mode="contained"
-            buttonColor="#1E88E5"
+            buttonColor={Theme.primary} //"#1E88E5"
             style={[STYLES.actionButtonTextStyle, { marginBottom: 10 }]}
             // onPress={() => router.push("/(auth)/register/add-friends")}
             onPress={() => router.push("/(auth)/register/contacts-verification")}
           >
-            <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", paddingVertical: 3}}>Verify More Friends</Text>
+            <Text style={{fontSize: SIZES.title, color: "#FFFFFF", paddingVertical: 6}}>Verify More Friends</Text>
             
           </Button>
           <Button
@@ -133,14 +143,16 @@ const DashboardScreen: React.FC = () => {
               router.replace("/(auth)/login");
             }}
           >
-            <Text style={{fontSize: SIZES.buttonFontSize, color: "#FFFFFF", paddingVertical: 3}}>Signout</Text>
+            <Text style={{fontSize: SIZES.title, color: "#FFFFFF", paddingVertical: 6}}>Signout</Text>
           </Button>
         </MotiView>
 
         {/* Scheduler Section */}
         <MotiView style={{ marginTop: 30 }}>
-          <Title style={{ color: Theme.text, fontSize: 22, marginBottom: 10 }}>Set Your Schedule</Title>
+          <Title style={{ color: Theme.text, fontSize: SIZES.title }}>Set Your Schedule</Title>
+
           <CalendarComponent />
+          
         </MotiView>
       </ScrollView>
 
@@ -155,7 +167,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     marginBottom: 20,
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#aaa"
+    // borderWidth: 1,
+    // borderColor: "#aaa"
+    // elevation: 0,
+    // boxShadow: "none"
   }
 });

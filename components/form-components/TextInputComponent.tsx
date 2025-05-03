@@ -81,6 +81,8 @@ const styles = StyleSheet.create({
         paddingVertical: 8, //16,
         paddingHorizontal: 16, //16,
         borderRadius: 10, // 16,
-        borderWidth: 1
+        borderWidth: 1,
+        borderColor: "#aaa",
+        fontSize: SIZES.fontSizeTextInput
     }
 });

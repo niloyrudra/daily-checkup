@@ -17,9 +17,15 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
 });
 
+
+const BASE_URL = process.env.BASE_URL || ''
+
 const Login: React.FC = () => {
+
+  console.log(BASE_URL)
+
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
